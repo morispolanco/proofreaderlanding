@@ -3,6 +3,591 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Corrector - Corrección Inteligente de Documentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        primaryDark: '#4A49B8',
+                        secondary: '#F3F4F6',
+                        lightBg: '#FFFFFF',
+                        darkBg: '#181818',
+                        darkText: '#E5E7EB',
+                    }
+                }
+            }
+        }
+
+        // Detectar modo oscuro
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="font-sans antialiased bg-lightBg dark:bg-darkBg text-gray-800 dark:text-darkText transition-colors duration-200">
+    <!-- Cabecera -->
+    <header class="sticky top-0 bg-white dark:bg-darkBg shadow-md dark:shadow-gray-800 z-10">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h1 class="text-xl font-bold text-primary">Text Corrector</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#caracteristicas" class="hover:text-primary transition-colors duration-200">Características</a>
+                <a href="#idiomas" class="hover:text-primary transition-colors duration-200">Idiomas</a>
+                <a href="#formato" class="hover:text-primary transition-colors duration-200">Formato</a>
+                <a href="#planes" class="hover:text-primary transition-colors duration-200">Planes</a>
+                <a href="#uso" class="hover:text-primary transition-colors duration-200">Cómo Usar</a>
+            </nav>
+            <button id="mobileMenuButton" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <!-- Menú móvil -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 shadow-md px-4 py-2">
+            <nav class="flex flex-col space-y-3 pb-3">
+                <a href="#caracteristicas" class="hover:text-primary transition-colors duration-200">Características</a>
+                <a href="#idiomas" class="hover:text-primary transition-colors duration-200">Idiomas</a>
+                <a href="#formato" class="hover:text-primary transition-colors duration-200">Formato</a>
+                <a href="#planes" class="hover:text-primary transition-colors duration-200">Planes</a>
+                <a href="#uso" class="hover:text-primary transition-colors duration-200">Cómo Usar</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sección Hero -->
+    <section class="py-16 md:py-24 px-4">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                    Corrección inteligente para documentos <span class="text-primary">Word</span>
+                </h1>
+                <p class="text-lg mb-8 text-gray-600 dark:text-gray-300">
+                    Una herramienta en línea impulsada por IA que corrige ortografía, gramática, puntuación y estilo en documentos Word mientras preserva todo el formato original.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="https://proofreader150.streamlit.app/" target="_blank" class="bg-primary hover:bg-primaryDark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center">
+                        Comenzar Ahora
+                    </a>
+                    <a href="#uso" class="border border-primary text-primary hover:bg-primary/10 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 text-center">
+                        Cómo Funciona
+                    </a>
+                </div>
+            </div>
+            <div class="md:w-1/2 relative">
+                <div class="bg-gray-200 dark:bg-gray-700 rounded-lg p-4 shadow-xl max-w-lg mx-auto">
+                    <div class="bg-white dark:bg-gray-800 rounded-md p-6 shadow-inner">
+                        <div class="flex items-start mb-4">
+                            <div class="mr-3 mt-1 text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <p class="text-gray-700 dark:text-gray-300 line-through">Este parrafo contiene errores ortograficos y problemas de estilo que deven ser correjidos.</p>
+                        </div>
+                        <div class="border-t dark:border-gray-600 my-3"></div>
+                        <div class="flex items-start">
+                            <div class="mr-3 mt-1 text-green-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <p class="text-gray-700 dark:text-gray-300">Este párrafo contiene errores ortográficos y problemas de estilo que deben ser corregidos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -bottom-6 -right-6 bg-primary text-white px-4 py-2 rounded-lg text-sm shadow-lg hidden md:block">
+                    Powered by xAI
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características principales -->
+    <section id="caracteristicas" class="py-16 bg-gray-50 dark:bg-gray-900 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Características Principales</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-spell-check text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Corrección Inteligente</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Utiliza el modelo qwen-turbo de DashScope para corregir errores ortográficos, gramaticales y de puntuación, optimizando el estilo para mejor legibilidad.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-quote-right text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Preservación de Citas</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Ignora inteligentemente el texto entre comillas para preservar citas literales, respetando el contenido original cuando es necesario.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-file-word text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Preservación del Formato</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Mantiene intactos los elementos de formato del documento original, como negritas, cursivas, subrayados y colores.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-book text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Reglas Específicas para Español</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Aplica reglas de capitalización específicas para títulos en español y maneja correctamente los dos puntos según normas gramaticales.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-tachometer-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Versión de Prueba</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Procesa documentos de hasta 150,000 caracteres en la versión de prueba, con notificación clara cuando se excede este límite.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 bg-primary/20 text-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-laptop-code text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Interfaz Intuitiva</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Sube un archivo .docx, selecciona el idioma y obtén un documento corregido listo para descargar con solo un clic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Soporte multilingüe -->
+    <section id="idiomas" class="py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Soporte Multilingüe</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
+                <p class="text-center text-lg mb-10">Compatible con múltiples idiomas para satisfacer tus necesidades globales</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 text-center">
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇪🇸</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇬🇧</span>
+                        <span>Inglés</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇫🇷</span>
+                        <span>Francés</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇩🇪</span>
+                        <span>Alemán</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇮🇹</span>
+                        <span>Italiano</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇵🇹</span>
+                        <span>Portugués</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇳🇱</span>
+                        <span>Holandés</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇷🇺</span>
+                        <span>Ruso</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇨🇳</span>
+                        <span>Chino</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇯🇵</span>
+                        <span>Japonés</span>
+                    </div>
+                    <div class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <span class="text-2xl mb-2">🇰🇷</span>
+                        <span>Coreano</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preservación del formato -->
+    <section id="formato" class="py-16 bg-gray-50 dark:bg-gray-900 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Preservación del Formato</h2>
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
+                    <h3 class="text-2xl font-semibold mb-4">Mantén el aspecto profesional de tus documentos</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-3 text-gray-600 dark:text-gray-300">Conserva <strong class="font-bold">negritas</strong>, <em class="italic">cursivas</em> y <u class="underline">subrayados</u></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-3 text-gray-600 dark:text-gray-300">Mantiene colores, tamaños y tipos de fuente</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-3 text-gray-600 dark:text-gray-300">Respeta estilos de párrafo y formatos complejos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-3 text-gray-600 dark:text-gray-300">Cuida la disposición y estructura del documento</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="ml-3 text-gray-600 dark:text-gray-300">Preserva tablas, listas y otros elementos complejos</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="lg:w-1/2">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md mx-auto">
+                        <div class="mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                            <h4 class="font-bold text-xl">Documento Original</h4>
+                        </div>
+                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded mb-6 bg-gray-50 dark:bg-gray-900">
+                            <p>Este <strong>documento</strong> mantiene <em>todo</em> su <span class="text-red-500">formato</span> <u>original</u> incluso despues de la correccion.</p>
+                        </div>
+                        <div class="mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                            <h4 class="font-bold text-xl">Documento Corregido</h4>
+                        </div>
+                        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900">
+                            <p>Este <strong>documento</strong> mantiene <em>todo</em> su <span class="text-red-500">formato</span> <u>original</u> incluso después de la corrección.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planes de acceso -->
+    <section id="planes" class="py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Sistema de Autenticación</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:transform hover:scale-105">
+                    <div class="bg-primary p-6 text-white">
+                        <h3 class="text-xl font-bold mb-2">Acceso Demo</h3>
+                        <p class="opacity-90">Prueba gratuita</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">5 correcciones incluidas</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">Hasta 150,000 caracteres</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">Prueba sin compromiso</span>
+                            </li>
+                        </ul>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-sm mb-6">
+                            <p>Usuario: <strong>demo</strong></p>
+                            <p>Contraseña: <strong>demo123</strong></p>
+                        </div>
+                        <a href="https://proofreader150.streamlit.app/" target="_blank" class="block w-full bg-primary hover:bg-primaryDark text-white text-center py-3 rounded-lg font-semibold transition-colors duration-200">
+                            Probar Ahora
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:transform hover:scale-105">
+                    <div class="bg-primary p-6 text-white">
+                        <h3 class="text-xl font-bold mb-2">Uso Ilimitado Personalizado</h3>
+                        <p class="opacity-90">Empresas/Instituciones</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">Correcciones ilimitadas</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">Límite de caracteres personalizado</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="ml-3 text-gray-600 dark:text-gray-300">Soporte prioritario</span>
+                            </li>
+                        </ul>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-sm mb-6">
+                            <p class="text-center">Contacta al administrador en:</p>
+                            <p class="text-center font-semibold">mp@ufm.edu</p>
+                        </div>
+                        <a href="mailto:mp@ufm.edu" class="block w-full bg-primary hover:bg-primaryDark text-white text-center py-3 rounded-lg font-semibold transition-colors duration-200">
+                            Contactar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cómo usar -->
+    <section id="uso" class="py-16 bg-gray-50 dark:bg-gray-900 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Cómo Utilizar Text Corrector</h2>
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">1</div>
+                            <h3 class="text-xl font-semibold">Accede a la aplicación</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Visita <a href="https://proofreader150.streamlit.app/" target="_blank" class="text-primary hover:underline">https://proofreader150.streamlit.app/</a> e inicia sesión con tus credenciales.</p>
+                        <div class="rounded-lg overflow-hidden shadow-md">
+                            <div class="bg-gray-200 dark:bg-gray-700 px-4 py-2 flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                <div class="flex-grow text-center text-sm text-gray-600 dark:text-gray-400">Login</div>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-900">
+                                <div class="flex flex-col space-y-3">
+                                    <label class="text-sm">Usuario</label>
+                                    <input type="text" class="p-2 border rounded" value="demo" disabled>
+                                    <label class="text-sm">Contraseña</label>
+                                    <input type="password" class="p-2 border rounded" value="•••••••" disabled>
+                                    <button disabled class="mt-2 bg-primary text-white py-2 rounded">Iniciar Sesión</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">2</div>
+                            <h3 class="text-xl font-semibold">Sube tu documento</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Sube tu archivo .docx y selecciona el idioma del documento.</p>
+                        <div class="rounded-lg overflow-hidden shadow-md">
+                            <div class="bg-gray-200 dark:bg-gray-700 px-4 py-2 flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                <div class="flex-grow text-center text-sm text-gray-600 dark:text-gray-400">Upload</div>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-900">
+                                <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Arrastra y suelta tu archivo .docx aquí</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">o</p>
+                                    <button disabled class="mt-2 bg-primary text-white py-1 px-4 rounded text-sm">Seleccionar archivo</button>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="text-sm block mb-2">Idioma</label>
+                                    <select disabled class="w-full p-2 border rounded">
+                                        <option>Español</option>
+                                        <option>Inglés</option>
+                                        <option>Francés</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">3</div>
+                            <h3 class="text-xl font-semibold">Corrige tu documento</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Haz clic en "Correct" y espera a que el proceso termine.</p>
+                        <div class="rounded-lg overflow-hidden shadow-md">
+                            <div class="bg-gray-200 dark:bg-gray-700 px-4 py-2 flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                <div class="flex-grow text-center text-sm text-gray-600 dark:text-gray-400">Processing</div>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-900">
+                                <div class="text-center py-6">
+                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                                    <p class="mt-3 text-gray-600 dark:text-gray-300">Procesando documento...</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Esto puede tomar unos minutos dependiendo del tamaño del documento</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">4</div>
+                            <h3 class="text-xl font-semibold">Descarga tu documento corregido</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Descarga el documento corregido y revisa los cambios con la función "Comparar documentos" de Word.</p>
+                        <div class="rounded-lg overflow-hidden shadow-md">
+                            <div class="bg-gray-200 dark:bg-gray-700 px-4 py-2 flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                <div class="flex-grow text-center text-sm text-gray-600 dark:text-gray-400">Download</div>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-900">
+                                <div class="text-center py-4">
+                                    <svg class="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <p class="mt-2 font-semibold">¡Documento corregido!</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">documento_corregido.docx</p>
+                                    <button disabled class="mt-4 bg-primary text-white py-2 px-6 rounded flex items-center mx-auto">
+                                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Descargar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Revisar Cambios</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">Para una revisión detallada, utiliza la función "Comparar" de Microsoft Word:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300">
+                        <li>Abre Microsoft Word</li>
+                        <li>Ve a la pestaña "Revisar"</li>
+                        <li>Haz clic en "Comparar"</li>
+                        <li>Selecciona el documento original y el documento corregido</li>
+                        <li>Haz clic en "Aceptar" para ver todos los cambios realizados</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-4">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-8 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h1 class="text-xl font-bold text-primary">Text Corrector</h1>
+                    </div>
+                    <p class="text-gray-400 max-w-xs">Una herramienta en línea impulsada por IA para corregir ortografía, gramática y estilo en documentos Word.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Enlaces rápidos</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#caracteristicas" class="text-gray-400 hover:text-white transition-colors duration-200">Características</a></li>
+                            <li><a href="#idiomas" class="text-gray-400 hover:text-white transition-colors duration-200">Idiomas</a></li>
+                            <li><a href="#formato" class="text-gray-400 hover:text-white transition-colors duration-200">Formato</a></li>
+                            <li><a href="#planes" class="text-gray-400 hover:text-white transition-colors duration-200">Planes</a></li>
+                            <li><a href="#uso" class="text-gray-400 hover:text-white transition-colors duration-200">Cómo Usar</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Contacto</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <a href="mailto:mp@ufm.edu" class="text-gray-400 hover:text-white transition-colors duration-200">mp@ufm.edu</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Acceso</h3>
+                        <a href="https://proofreader150.streamlit.app/" target="_blank" class="bg-primary hover:bg-primaryDark text-white py-2 px-4 rounded-lg inline-block transition-colors duration-200">Ir a la aplicación</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400 text-sm">
+                <p>Desarrollado por xAI © 2025. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle mobile menu
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Corrector - Corregir Documentos con IA</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
